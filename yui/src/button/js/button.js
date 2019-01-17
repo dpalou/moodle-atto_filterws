@@ -169,11 +169,39 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
 
         if (selection) {
             // The function insertContentAtFocusPoint can insert extra tags, so we won't use it.
-            // Search the starting and ending text nodes to use, and add the tags in their contents.
+            // Search the starting and ending text nodes to use.
             var endText = this._getTextElement(selection.endContainer, selection.endOffset),
                 startText = this._getTextElement(selection.startContainer, selection.startOffset);
 
             if (startText && endText) {
+
+                if (startText === endText && selection.startOffset === 0 && selection.endOffset === startText.data.length) {
+                    // User selected the whole text. Check if we should wrap the parent instead of just the text.
+                    var nodeToWrap = this._searchParentToWrap(startText);
+
+                    if (nodeToWrap != startText && nodeToWrap.parentNode) {
+                        // We should wrap a certain node, re-calculate the texts to use.
+                        var parent = nodeToWrap.parentNode,
+                            position = Array.from(parent.childNodes).indexOf(nodeToWrap);
+
+                        if (position != -1) {
+                            // Create new texts elements and insert them in the right place.
+                            startText = document.createTextNode('');
+                            endText = document.createTextNode('');
+
+                            var nextElement = parent.childNodes[position + 1];
+                            if (nextElement) {
+                                parent.insertBefore(endText, nextElement);
+                            } else {
+                                parent.appendChild(endText);
+                            }
+
+                            parent.insertBefore(startText, nodeToWrap);
+                        }
+                    }
+                }
+
+                // Add the filter tags in the contents of each of the texts.
                 // If it's a child text, don't use any offset.
                 var offset = endText === selection.endContainer ? selection.endOffset : 0;
 
@@ -212,7 +240,7 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
     /**
      * If the supplied node is a Text node, return it. Otherwise, create a child Text node at a certain position.
      *
-     * @method findFirstText
+     * @method _getTextElement
      * @param {Node} node The node to search in.
      * @param {Number} offset The offset to check.
      * @return {Node} The text node to use.
@@ -248,6 +276,27 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
                     return newText;
                 }
             }
+        }
+    },
+
+    /**
+     * Find the element that should be wrapped with the filter.
+     * If the current node is the only child of the parent, wrap the whole parent.
+     *
+     * @method _searchParentToWrap
+     * @param {Node} node The node to check.
+     * @return {Node} The node to wrap.
+     * @private
+     */
+    _searchParentToWrap: function(node) {
+        var parent = node.parentNode;
+
+        if (parent && parent.childNodes && parent.childNodes.length === 1) {
+            // Current node is  the only node in the parent, we can wrap the whole parent.
+            return this._searchParentToWrap(parent);
+        } else {
+            // Current node has siblings, we can't wrap the parent. Return current node.
+            return node;
         }
     }
 }, {
