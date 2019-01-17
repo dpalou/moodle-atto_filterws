@@ -23,5 +23,14 @@
  */
 
 $string['addfilterws'] = 'Add WebService filter tag';
+$string['filteruseragent'] = 'Filter by User Agent';
+$string['filteruseragent_help'] = 'If a value is provided, the selected content will only be displayed if the User Agent matches this value. The value will be converted to a regular expression.';
+$string['insert'] = 'Insert';
+$string['insertfilterws'] = 'Insert WS filter';
+$string['origin'] = 'Origin';
+$string['origin_help'] = 'Web: Only display in browser.<br>Web Service: Only display in a WS client, like the Moodle app.<br>Any: Display for all origins.';
+$string['originany'] = 'Any';
+$string['originweb'] = 'Web';
+$string['originws'] = 'Web Service';
 $string['pluginname'] = 'WebService Filter for Atto';
 $string['privacy:metadata'] = 'The atto_filterws plugin does not store any personal data.';

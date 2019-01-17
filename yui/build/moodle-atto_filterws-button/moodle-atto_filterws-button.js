@@ -33,30 +33,143 @@ YUI.add('moodle-atto_filterws-button', function (Y, NAME) {
  * @extends M.editor_atto.EditorPlugin
  */
 
+var COMPONENTNAME = 'atto_filterws',
+    ORIGINS = [ // Possible origins.
+        {
+            name: 'web',
+            str: 'originweb',
+            value: 'web'
+        },
+        {
+            name: 'ws',
+            str: 'originws',
+            value: 'ws'
+        },
+        {
+            name: 'any',
+            str: 'originany',
+            value: 'any'
+        }
+    ],
+
+    CSS = {
+        FORM: 'atto_filterws_form',
+        INPUTORIGIN: 'atto_filterws_origin',
+        INPUTUSERAGENT: 'atto_filterws_useragent',
+        INPUTSUBMIT: 'atto_filterws_submit',
+        FILTERUSERAGENT: 'atto_filterws_filteruseragent'
+    },
+
+    TEMPLATE = '' +
+        '<form class="atto_form {{CSS.FORM}}">' +
+            // Add the origin selector.
+            '<div class="form-inline m-b-1">' +
+                '<label class="for="{{elementid}}_{{CSS.INPUTORIGIN}}">{{get_string "origin" component}}' +
+                    ' {{{helpStrings.origin}}}</label>' +
+                '<select class="custom-select {{CSS.INPUTORIGIN}}" id="{{elementid}}_{{CSS.INPUTORIGIN}}">' +
+                    '{{#each origins}}' +
+                        '<option value="{{value}}">{{get_string str ../component}}</option>' +
+                    '{{/each}}' +
+                '</select>' +
+            '</div>' +
+
+            // Filter by user agent.
+            '<div class="m-b-1">' +
+                '<label for="{{elementid}}_{{CSS.INPUTUSERAGENT}}">{{get_string "filteruseragent" component}}' +
+                    ' {{{helpStrings.filteruseragent}}}</label>' +
+                '<input class="form-control fullwidth {{CSS.INPUTUSERAGENT}}" type="text" value="" ' +
+                'id="{{elementid}}_{{CSS.INPUTUSERAGENT}}" size="32"/>' +
+            '</div>' +
+
+            // Add the submit button and close the form.
+            '<button class="btn btn-default {{CSS.INPUTSUBMIT}}" type="submit">{{get_string "insert" component}}</button>' +
+        '</form>';
+
 Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.EditorPlugin, [], {
+    /**
+     * A reference to the current selection at the time that the dialogue
+     * was opened.
+     *
+     * @property _currentSelection
+     * @type Range
+     * @private
+     */
+    _currentSelection: null,
+
     initializer: function() {
         this.addButton({
             icon: 'icon',
             iconComponent: 'atto_filterws',
             title: 'addfilterws',
             buttonName: 'addfilterws',
-            callback: this.addFilterTag
+            callback: this._displayDialogue
         });
+    },
+
+    /**
+     * Display the WS filter dialog.
+     *
+     * @method _displayDialogue
+     * @private
+     */
+    _displayDialogue: function() {
+        // Store the current selection.
+        this._currentSelection = this.get('host').getSelection()[0];
+
+        if (!this._currentSelection) {
+            return;
+        }
+
+        var dialogue = this.getDialogue({
+            headerContent: M.util.get_string('insertfilterws', COMPONENTNAME),
+            focusAfterHide: true
+        }, true);
+
+        // Set the dialogue content, and then show the dialogue.
+        dialogue.set('bodyContent', this._getDialogueContent()).show();
+    },
+
+    /**
+     * Return the dialogue content for the tool.
+     *
+     * @method _getDialogueContent
+     * @return {Node} The content to place in the dialogue.
+     * @private
+     */
+    _getDialogueContent: function() {
+        var template = Y.Handlebars.compile(TEMPLATE),
+            content = Y.Node.create(template({
+                elementid: this.get('host').get('elementid'),
+                CSS: CSS,
+                component: COMPONENTNAME,
+                origins: ORIGINS,
+                helpStrings: this.get('help')
+            }));
+
+        this._form = content;
+
+        this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._addFilterTag, this);
+
+        return content;
     },
 
     /**
      * Adds a filter WS tag surrounding the currently selected content.
      *
      * @method addFilterTag
+     * @param {EventFacade} e
+     * @private
      */
-    addFilterTag: function() {
-        // Get the selected text.
-        var host = this.get('host'),
-            selection = host.getSelection();
+    _addFilterTag: function(e) {
+        e.preventDefault();
 
-        if (selection && selection[0]) {
-            selection = selection[0];
+        var form = this._form,
+            origin = form.one('.' + CSS.INPUTORIGIN).get('value'),
+            userAgent = form.one('.' + CSS.INPUTUSERAGENT).get('value'),
+            selection = this._currentSelection,
+            focusElement = null;
 
+        if (selection) {
             // The function insertContentAtFocusPoint can insert extra tags, so we won't use it.
             // Search the starting and ending text nodes to use, and add the tags in their contents.
             var endText = this._getTextElement(selection.endContainer, selection.endOffset),
@@ -73,7 +186,15 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
                 offset = startText === selection.startContainer ? selection.startOffset : 0;
 
                 // Open the tag.
-                startText.data = startText.data.substring(0, offset) + '{fws web}' + startText.data.substring(offset);
+                var tag = '{fws ' + origin + (userAgent ? (' ua="' + userAgent + '"') : '') + '}';
+                startText.data = startText.data.substring(0, offset) + tag + startText.data.substring(offset);
+
+                // Determine the element to focus after hiding the dialogue.
+                if (selection.startContainer.nodeType == Node.TEXT_NODE) {
+                    focusElement = selection.startContainer.parentElement;
+                } else {
+                    focusElement = selection.startContainer;
+                }
             } else {
                 window.console.warn('Could not find the right elements to insert the fws tag.');
             }
@@ -83,6 +204,11 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
         } else {
             window.console.warn('Could not find a selection to insert the fws tag.');
         }
+
+        // Hide the dialogue.
+        this.getDialogue({
+            focusAfterHide: focusElement
+        }).hide();
     },
 
     /**
@@ -95,6 +221,8 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
      * @private
      */
     _getTextElement: function(node, offset) {
+        var newText;
+
         if (node.nodeType == Node.TEXT_NODE) {
             // It's already a text node, return it.
             return node;
@@ -102,7 +230,7 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
 
             if (offset >= node.childNodes.length) {
                 // Create a new Text node and add it to the end.
-                var newText = document.createTextNode('');
+                newText = document.createTextNode('');
 
                 node.appendChild(newText);
 
@@ -115,7 +243,7 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
                     return childNode;
                 } else {
                     // Create a new Text node and add it to the right position.
-                    var newText = document.createTextNode('');
+                    newText = document.createTextNode('');
 
                     node.insertBefore(newText, childNode);
 
@@ -123,6 +251,10 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
                 }
             }
         }
+    }
+}, {
+    ATTRS: {
+        help: {}
     }
 });
 
