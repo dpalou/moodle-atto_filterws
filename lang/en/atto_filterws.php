@@ -25,11 +25,11 @@
 $string['addfilterws'] = 'Add WebService filter tag';
 $string['apply'] = 'Apply';
 $string['filteruseragent'] = 'Filter by User Agent';
-$string['filteruseragent_help'] = 'If a value is provided, the selected content will only be displayed if the User Agent matches this value. The value will be converted to a regular expression.';
+$string['filteruseragent_help'] = 'If a value is provided, the selected content will only be displayed if the User Agent contains this value. The value will be converted to a regular expression.';
 $string['insert'] = 'Insert';
-$string['insertfilterws'] = 'Insert WS filter';
+$string['insertfilterws'] = 'Insert Web Service filter';
 $string['origin'] = 'Origin';
-$string['origin_help'] = 'Web: Only display in browser.<br>Web Service: Only display in a WS client, like the Moodle app.<br>Any: Display for all origins.';
+$string['origin_help'] = 'Web: Only display in browser.<br>Web Service: Only display in a Web Service client, like the Moodle app.<br>Any: Display for all origins.';
 $string['originany'] = 'Any';
 $string['originweb'] = 'Web';
 $string['originws'] = 'Web Service';
