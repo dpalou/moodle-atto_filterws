@@ -32,13 +32,15 @@ function atto_filterws_strings_for_js() {
 
     $strings = array(
         'addfilterws',
+        'apply',
         'filteruseragent',
         'insert',
         'insertfilterws',
         'origin',
         'originany',
         'originweb',
-        'originws'
+        'originws',
+        'predefined'
     );
 
     $PAGE->requires->strings_for_js($strings, 'atto_filterws');
@@ -52,11 +54,34 @@ function atto_filterws_strings_for_js() {
 function atto_filterws_params_for_js() {
     global $OUTPUT;
 
+    // List of predefined filters.
+    $predefined = [];
+    $predefinedstr = get_config('atto_filterws', 'predefined');
+
+    if ($predefinedstr) {
+        $entries = preg_split('/\r\n|\r|\n/', $predefinedstr);
+
+        foreach ($entries as $entry) {
+            $fields = explode('|', $entry);
+
+            if (count($fields) < 2) {
+                continue;
+            }
+
+            $predefined[] = [
+                'name' => $fields[0],
+                'origin' => $fields[1],
+                'useragent' => $fields[2]
+            ];
+        }
+    }
+
     $params = [
         'help' => [
             'filteruseragent' => $OUTPUT->help_icon('filteruseragent', 'atto_filterws'),
             'origin' => $OUTPUT->help_icon('origin', 'atto_filterws')
-        ]
+        ],
+        'predefined' => $predefined
     ];
 
     return $params;

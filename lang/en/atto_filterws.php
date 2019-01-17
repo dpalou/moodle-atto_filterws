@@ -23,6 +23,7 @@
  */
 
 $string['addfilterws'] = 'Add WebService filter tag';
+$string['apply'] = 'Apply';
 $string['filteruseragent'] = 'Filter by User Agent';
 $string['filteruseragent_help'] = 'If a value is provided, the selected content will only be displayed if the User Agent matches this value. The value will be converted to a regular expression.';
 $string['insert'] = 'Insert';
@@ -33,4 +34,12 @@ $string['originany'] = 'Any';
 $string['originweb'] = 'Web';
 $string['originws'] = 'Web Service';
 $string['pluginname'] = 'WebService Filter for Atto';
+$string['predefined'] = 'Predefined filters';
+$string['predefined_desc'] = 'List of predefined filters that all users will be able to use when using the Atto editor.
+
+Enter each filter on a new line with format: name to display, origin (web, ws or any) and User Agent (optional), separated by pipe characters. For example:
+<pre>
+    Official Moodle App|ws|MoodleMobile
+</pre>';
 $string['privacy:metadata'] = 'The atto_filterws plugin does not store any personal data.';
+$string['settings'] = 'WebService Filter settings';

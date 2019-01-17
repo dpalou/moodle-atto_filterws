@@ -52,14 +52,34 @@ var COMPONENTNAME = 'atto_filterws',
 
     CSS = {
         FORM: 'atto_filterws_form',
+        INPUTPREDEFINED: 'atto_filterws_predefined',
         INPUTORIGIN: 'atto_filterws_origin',
         INPUTUSERAGENT: 'atto_filterws_useragent',
         INPUTSUBMIT: 'atto_filterws_submit',
-        FILTERUSERAGENT: 'atto_filterws_filteruseragent'
+        FILTERUSERAGENT: 'atto_filterws_filteruseragent',
+        APPLYPREDEFINED: 'atto_filterws_apply_predefined'
     },
 
     TEMPLATE = '' +
         '<form class="atto_form {{CSS.FORM}}">' +
+            // Add the predefined filters selector.
+            '{{#if hasPredefined}}' +
+                '<div class="form-inline m-b-1">' +
+                    '<label class="for="{{elementid}}_{{CSS.INPUTPREDEFINED}}">{{get_string "predefined" component}}</label>' +
+                    '<div class="input-group input-append w-100">' +
+                        '<select class="custom-select {{CSS.INPUTPREDEFINED}}" id="{{elementid}}_{{CSS.INPUTPREDEFINED}}">' +
+                            '{{#each predefined}}' +
+                                '<option value="{{@index}}">{{name}}</option>' +
+                            '{{/each}}' +
+                        '</select>' +
+                        '<span class="input-group-append">' +
+                            '<button class="btn btn-default {{CSS.APPLYPREDEFINED}}" type="button">' +
+                            '{{get_string "apply" component}}</button>' +
+                        '</span>' +
+                    '</div>' +
+                '</div>' +
+            '{{/if}}' +
+
             // Add the origin selector.
             '<div class="form-inline m-b-1">' +
                 '<label class="for="{{elementid}}_{{CSS.INPUTORIGIN}}">{{get_string "origin" component}}' +
@@ -136,25 +156,52 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
      */
     _getDialogueContent: function() {
         var template = Y.Handlebars.compile(TEMPLATE),
+            predefined = this.get('predefined'),
             content = Y.Node.create(template({
                 elementid: this.get('host').get('elementid'),
                 CSS: CSS,
                 component: COMPONENTNAME,
                 origins: ORIGINS,
-                helpStrings: this.get('help')
+                helpStrings: this.get('help'),
+                hasPredefined: predefined && predefined.length > 0,
+                predefined: predefined
             }));
 
         this._form = content;
 
         this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._addFilterTag, this);
 
+        if (predefined && predefined.length > 0) {
+            this._form.one('.' + CSS.APPLYPREDEFINED).on('click', this._applyPredefined, this);
+        }
+
         return content;
+    },
+
+    /**
+     * Apply a predefined filter.
+     *
+     * @method _applyPredefined
+     * @param {EventFacade} e
+     * @private
+     */
+    _applyPredefined: function(e) {
+        e.preventDefault();
+
+        var selected = this._form.one('.' + CSS.INPUTPREDEFINED).get('value'),
+            filter = this.get('predefined')[selected];
+
+        if (filter) {
+            // Update the inputs.
+            this._form.one('.' + CSS.INPUTORIGIN).set('value', filter.origin);
+            this._form.one('.' + CSS.INPUTUSERAGENT).set('value', filter.useragent || '');
+        }
     },
 
     /**
      * Adds a filter WS tag surrounding the currently selected content.
      *
-     * @method addFilterTag
+     * @method _addFilterTag
      * @param {EventFacade} e
      * @private
      */
@@ -301,6 +348,7 @@ Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.
     }
 }, {
     ATTRS: {
-        help: {}
+        help: {},
+        predefined: []
     }
 });
