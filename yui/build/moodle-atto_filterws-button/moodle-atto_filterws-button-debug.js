@@ -66,8 +66,10 @@ var COMPONENTNAME = 'atto_filterws',
         '<form class="atto_form {{CSS.FORM}}">' +
             // Add the predefined filters selector.
             '{{#if hasPredefined}}' +
-                '<div class="form-inline m-b-1">' +
-                    '<label class="for="{{elementid}}_{{CSS.INPUTPREDEFINED}}">{{get_string "predefined" component}}</label>' +
+                '<div class="form-inline m-b-1 mb-1">' +
+                    '<label class="m-b-1 mb-1" for="{{elementid}}_{{CSS.INPUTPREDEFINED}}">' +
+                        '{{get_string "predefined" component}}' +
+                    '</label>' +
                     '<div class="input-group input-append w-100">' +
                         '<select class="custom-select {{CSS.INPUTPREDEFINED}}" id="{{elementid}}_{{CSS.INPUTPREDEFINED}}">' +
                             '{{#each predefined}}' +
@@ -75,7 +77,7 @@ var COMPONENTNAME = 'atto_filterws',
                             '{{/each}}' +
                         '</select>' +
                         '<span class="input-group-append">' +
-                            '<button class="btn btn-default {{CSS.APPLYPREDEFINED}}" type="button">' +
+                            '<button class="btn btn-default btn-secondary {{CSS.APPLYPREDEFINED}}" type="button">' +
                             '{{get_string "apply" component}}</button>' +
                         '</span>' +
                     '</div>' +
@@ -83,8 +85,8 @@ var COMPONENTNAME = 'atto_filterws',
             '{{/if}}' +
 
             // Add the origin selector.
-            '<div class="form-inline m-b-1">' +
-                '<label class="for="{{elementid}}_{{CSS.INPUTORIGIN}}">{{get_string "origin" component}}' +
+            '<div class="form-inline m-b-1 mb-1">' +
+                '<label for="{{elementid}}_{{CSS.INPUTORIGIN}}">{{get_string "origin" component}}' +
                     ' {{{helpStrings.origin}}}</label>' +
                 '<select class="custom-select {{CSS.INPUTORIGIN}}" id="{{elementid}}_{{CSS.INPUTORIGIN}}">' +
                     '{{#each origins}}' +
@@ -94,7 +96,7 @@ var COMPONENTNAME = 'atto_filterws',
             '</div>' +
 
             // Filter by user agent.
-            '<div class="m-b-1">' +
+            '<div class="m-b-1 mb-1">' +
                 '<label for="{{elementid}}_{{CSS.INPUTUSERAGENT}}">{{get_string "filteruseragent" component}}' +
                     ' {{{helpStrings.filteruseragent}}}</label>' +
                 '<input class="form-control fullwidth {{CSS.INPUTUSERAGENT}}" type="text" value="" ' +
@@ -102,7 +104,9 @@ var COMPONENTNAME = 'atto_filterws',
             '</div>' +
 
             // Add the submit button and close the form.
-            '<button class="btn btn-default {{CSS.INPUTSUBMIT}}" type="submit">{{get_string "insert" component}}</button>' +
+            '<button class="btn btn-default btn-secondary {{CSS.INPUTSUBMIT}}" type="submit">' +
+                '{{get_string "insert" component}}' +
+            '</button>' +
         '</form>';
 
 Y.namespace('M.atto_filterws').Button = Y.Base.create('button', Y.M.editor_atto.EditorPlugin, [], {
