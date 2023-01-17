@@ -39,7 +39,7 @@ $string['predefined_desc'] = 'Llistat de filtres predefinits que els usuaris pod
 
 Introdueix cada filtre en una nova línia amb el següent format: nom a mostrar, origen (web, ws o any) i User Agent (opcional), separats per un caràcter "|". Per exemple:
 <pre>
-    Official Moodle App|ws|MoodleMobile
+    Moodle App|ws|MoodleMobile
 </pre>';
 $string['privacy:metadata'] = 'El connector atto_filterws no emmagatzema informació personal.';
 $string['settings'] = 'Configuració del filtre de Serveis web';

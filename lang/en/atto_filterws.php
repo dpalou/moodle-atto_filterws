@@ -39,7 +39,7 @@ $string['predefined_desc'] = 'List of predefined filters that all users will be 
 
 Enter each filter on a new line with format: name to display, origin (web, ws or any) and User Agent (optional), separated by pipe characters. For example:
 <pre>
-    Official Moodle App|ws|MoodleMobile
+    Moodle App|ws|MoodleMobile
 </pre>';
 $string['privacy:metadata'] = 'The atto_filterws plugin does not store any personal data.';
 $string['settings'] = 'WebService Filter settings';

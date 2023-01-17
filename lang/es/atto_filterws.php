@@ -39,7 +39,7 @@ $string['predefined_desc'] = 'Listado de filtros predefinidos que los usuarios p
 
 Introduce cada filtro en una nueva línea con el siguiente formato: nombre a mostrar, origen (web, ws o any) y User Agent (opcional), separados por un carácter "|". Por ejemplo:
 <pre>
-    Official Moodle App|ws|MoodleMobile
+    Moodle App|ws|MoodleMobile
 </pre>';
 $string['privacy:metadata'] = 'La extensión atto_filterws no almacena información personal.';
 $string['settings'] = 'Opciones del filtro de Servicios Web';

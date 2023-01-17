@@ -31,7 +31,7 @@ if ($ADMIN->fulltree) {
     // Predefined filters.
     $name = new lang_string('predefined', 'atto_filterws');
     $desc = new lang_string('predefined_desc', 'atto_filterws');
-    $default = 'Official Moodle App|ws|MoodleMobile\s?$';
+    $default = 'Moodle App|ws|MoodleMobile';
     $setting = new admin_setting_configtextarea('atto_filterws/predefined',
                                                 $name,
                                                 $desc,
